@@ -15,17 +15,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class DailyTransaction {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String sender;
-    private String senderBank;
-    private String senderAccount;
-    private String receiver;
-    private String receiverBank;
-    private String receiverAccount;
-    private Long amount;
-    private String amountRange;
+    private Long id;                    // id
+    private String sender;              // 송신인
+    private String senderBank;          // 송신인 은행
+    private String senderAccount;       // 송신인 계좌
+    private String receiver;            // 수신인
+    private String receiverBank;        // 수신인 은행
+    private String receiverAccount;     // 수신인 계좌
+    private Long amount;                // 금액
+    private String amountRange;         // 금액 범위
 
     @Column(updatable = false)
     @CreatedDate
-    private LocalDateTime transferTime;
+    private LocalDateTime transferTime; // 송금 시간
 }

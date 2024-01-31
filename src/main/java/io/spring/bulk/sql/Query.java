@@ -1,24 +1,24 @@
 package io.spring.bulk.sql;
 
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.sql.*;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Random;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class Query {
 
-    @Value("${spring.datasource.url}")
-    String url;
-    @Value("${spring.datasource.username}")
-    String user;
-    @Value("${spring.datasource.password}")
-    String pwd;
+    private final DataSource dataSource;
 
     @PostConstruct
     public void batchInsert() {
@@ -35,20 +35,20 @@ public class Query {
                 " (sender, sender_bank, sender_account, receiver, receiver_bank, receiver_account, amount, amount_range, transfer_time)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection connection = DriverManager.getConnection(url, user, pwd)) {
+        try (Connection connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 Random random = new Random();
-                int day = -4;
+                int day = -10;
 
-                for (int j = 1; j < 27; j++) {
+                for (int j = 1; j < 20; j++) {
                     Calendar yesterday = Calendar.getInstance();
                     yesterday.add(Calendar.DAY_OF_MONTH, day);
                     log.info("오늘로부터 {}일자 작업", day);
                     log.info("작업날짜 = {}월 {}일", yesterday.get(Calendar.MONTH) + 1, yesterday.get(Calendar.DAY_OF_MONTH));
 
-                    for (int i = 1; i < 1000000; i++) {
+                    for (int i = 1; i < 1001000; i++) {
                         preparedStatement.setString(1, sender[random.nextInt(sender.length)]);
                         preparedStatement.setString(2, bank[random.nextInt(bank.length)]);
                         preparedStatement.setString(3, account[random.nextInt(account.length)]);
@@ -60,7 +60,7 @@ public class Query {
                         preparedStatement.setTimestamp(9, new Timestamp(yesterday.getTimeInMillis()));
                         preparedStatement.addBatch();
 
-                        if (i % 100000 == 0) {
+                        if (i % 200000 == 0) {
                             preparedStatement.executeBatch();
                             connection.commit();
                             log.info("{}번째 데이터 생성 완료, DB INSERT 후 COMMIT 완료", i);
