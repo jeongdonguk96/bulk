@@ -14,5 +14,6 @@ public class Bank extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String bankId;
     private Long balance;
 }
