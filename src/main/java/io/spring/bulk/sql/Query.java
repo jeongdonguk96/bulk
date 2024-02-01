@@ -21,7 +21,7 @@ public class Query {
 
     private final DataSource dataSource;
 
-    @PostConstruct
+//    @PostConstruct
     public void batchInsert() {
         long startTime = System.currentTimeMillis();
         log.info("배치 인서트 시작");
@@ -46,9 +46,9 @@ public class Query {
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 Random random = new Random();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-                int day = 0;
+                int day = -17;
 
-                for (int j = 1; j < 31; j++) {
+                for (int j = 1; j < 14; j++) {
                     Calendar yesterday = Calendar.getInstance();
                     yesterday.add(Calendar.DAY_OF_MONTH, day);
                     log.info("오늘로부터 {}일자 작업", day);
