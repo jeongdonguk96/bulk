@@ -37,36 +37,8 @@ public class DailyTransactionRepositoryImpl implements DailyTransactionRepositor
                         dailyTransaction.transferDay
                 ))
                 .from(dailyTransaction)
-                .where(dailyTransaction.id.gt(lastSeenKey))
                 .where(dailyTransaction.transferDay.eq(transferDay).and(dailyTransaction.id.gt(lastSeenKey)))
                 .orderBy(dailyTransaction.id.asc())
-                .limit(pageSize)
-                .fetch();
-    }
-
-    @Override
-    public List<DailyTransactionDto> getDailyTransactionWithOffset(String transferDay, int offset, int pageSize) {
-        return queryFactory
-                .select(new QDailyTransactionDto(
-                        dailyTransaction.id,
-                        dailyTransaction.sender,
-                        dailyTransaction.senderId,
-                        dailyTransaction.senderBank,
-                        dailyTransaction.senderBankId,
-                        dailyTransaction.senderAccount,
-                        dailyTransaction.receiver,
-                        dailyTransaction.receiverId,
-                        dailyTransaction.receiverBank,
-                        dailyTransaction.receiverBankId,
-                        dailyTransaction.receiverAccount,
-                        dailyTransaction.amount,
-                        dailyTransaction.transferTime,
-                        dailyTransaction.transferDay
-                ))
-                .from(dailyTransaction)
-                .where(dailyTransaction.transferDay.eq(transferDay))
-                .orderBy(dailyTransaction.id.asc())
-                .offset(offset)
                 .limit(pageSize)
                 .fetch();
     }

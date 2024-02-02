@@ -25,3 +25,7 @@ spring:
       initialize-schema: always
     job:
       enabled: true
+
+batch:
+  dailyBankSettlementJob:
+    pageSize: 200000

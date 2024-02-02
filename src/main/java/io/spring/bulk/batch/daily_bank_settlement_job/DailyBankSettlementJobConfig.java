@@ -1,11 +1,13 @@
 package io.spring.bulk.batch.daily_bank_settlement_job;
 
 
+import io.spring.bulk.batch.CustomJobListener;
 import io.spring.bulk.dto.DailyTransactionDto;
 import io.spring.bulk.repository.DailyTransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
@@ -31,10 +33,11 @@ public class DailyBankSettlementJobConfig {
     private final DailyTransactionRepository dailyTransactionRepository;
 
     @Bean
-    public Job dailyBankSettlementJob(Step dailyBankSettlementStep) {
+    public Job dailyBankSettlementJob(Step dailyBankSettlementStep, JobExecutionListener customJobListener) {
         return new JobBuilder("dailyBankSettlementJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(dailyBankSettlementStep)
+                .listener(customJobListener)
                 .build();
     }
 
@@ -60,6 +63,11 @@ public class DailyBankSettlementJobConfig {
             public void write(Chunk<?> chunk) {
             }
         };
+    }
+
+    @Bean
+    public JobExecutionListener customJobListener() {
+        return new CustomJobListener();
     }
 
 }
