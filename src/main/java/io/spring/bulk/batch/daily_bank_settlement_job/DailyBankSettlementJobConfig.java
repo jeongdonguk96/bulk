@@ -16,7 +16,6 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -29,10 +28,9 @@ public class DailyBankSettlementJobConfig {
 
     private final PlatformTransactionManager transactionManager;
     private final JobRepository jobRepository;
-
     private final DailyTransactionRepository dailyTransactionRepository;
 
-    @Bean
+//    @Bean
     public Job dailyBankSettlementJob(Step dailyBankSettlementStep, JobExecutionListener customJobListener) {
         return new JobBuilder("dailyBankSettlementJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
@@ -41,7 +39,7 @@ public class DailyBankSettlementJobConfig {
                 .build();
     }
 
-    @Bean
+//    @Bean
     public Step dailyBankSettlementStep(ItemReader<List<DailyTransactionDto>> dailyBankSettlementReader,
                                         ItemWriter<Object> dailyBankSettlementWriter) {
         return new StepBuilder("dailyBankSettlementStep", jobRepository)
@@ -51,12 +49,12 @@ public class DailyBankSettlementJobConfig {
                 .build();
     }
 
-    @Bean
+//    @Bean
     public ItemReader<List<DailyTransactionDto>> dailyBankSettlementReader() {
         return new DailyBankSettlementReader(dailyTransactionRepository);
     }
 
-    @Bean
+//    @Bean
     public ItemWriter<Object> dailyBankSettlementWriter() {
         return new ItemWriter<Object>() {
             @Override
@@ -65,7 +63,7 @@ public class DailyBankSettlementJobConfig {
         };
     }
 
-    @Bean
+//    @Bean
     public JobExecutionListener customJobListener() {
         return new CustomJobListener();
     }

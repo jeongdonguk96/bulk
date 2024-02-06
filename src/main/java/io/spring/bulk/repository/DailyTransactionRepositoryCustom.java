@@ -10,4 +10,10 @@ public interface DailyTransactionRepositoryCustom {
     List<DailyTransactionDto> getDailyTransactionWithNoOffset(@Param("transferDay") String transferDay,
                                                               @Param("lastSeenKey") Long lastSeenKey,
                                                               @Param("pageSize") int pageSize);
+
+    List<DailyTransactionDto> getTrx(@Param("receiverId") String receiverId,
+                                     @Param("transferDay") String transferDay,
+                                     @Param("amount") Long amount,
+                                     @Param("pageSize") int pageSize,
+                                     @Param("lastSeenAmount") int lastSeenAmount);
 }
