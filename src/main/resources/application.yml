@@ -5,11 +5,11 @@ spring:
   datasource:
     hikari:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      jdbc-url: jdbc:mysql://localhost:3306/bulk
+      jdbc-url: jdbc:mysql://localhost:3306/bulk?rewriteBatchedStatements=true
       username: root
       password: wjdehddnr1@
-      minimum-idle: 5
-      maximum-pool-size: 5
+      minimum-idle: 15
+      maximum-pool-size: 15
 
   jpa:
     open-in-view: false

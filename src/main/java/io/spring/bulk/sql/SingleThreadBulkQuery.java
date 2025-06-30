@@ -17,11 +17,14 @@ import java.util.Random;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class Query {
+public class SingleThreadBulkQuery {
 
     private final DataSource dataSource;
+    private static final int DAY_RANGE = 10;
+    private static final int DATA_SIZE = 100_000;
+    private static final int COMMIT_SIZE = 10_000;
 
-//    @PostConstruct
+    @PostConstruct
     public void batchInsert() {
         long startTime = System.currentTimeMillis();
         log.info("배치 인서트 시작");
@@ -46,15 +49,14 @@ public class Query {
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 Random random = new Random();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-                int day = -17;
+                int day = -1;
 
-                for (int j = 1; j < 14; j++) {
+                for (int j = 0; j < DAY_RANGE; j++) {
+                    long dailyStartTime = System.currentTimeMillis();
                     Calendar yesterday = Calendar.getInstance();
                     yesterday.add(Calendar.DAY_OF_MONTH, day);
-                    log.info("오늘로부터 {}일자 작업", day);
-                    log.info("작업날짜 = {}월 {}일", yesterday.get(Calendar.MONTH) + 1, yesterday.get(Calendar.DAY_OF_MONTH));
 
-                    for (int i = 1; i < 1000000; i++) {
+                    for (int i = 1; i <= DATA_SIZE; i++) {
                         preparedStatement.setString(1, sender[i % sender.length]);
                         preparedStatement.setString(2, senderId[i % senderId.length]);
                         preparedStatement.setString(3, sendBank[i % sendBank.length]);
@@ -70,14 +72,21 @@ public class Query {
                         preparedStatement.setString(13, dateFormat.format(yesterday.getTime()));
                         preparedStatement.addBatch();
 
-                        if (i % 200000 == 0) {
+                        if (i % COMMIT_SIZE == 0) {
                             preparedStatement.executeBatch();
+                            preparedStatement.clearBatch();
                             connection.commit();
-                            log.info("{}번째 데이터 생성 완료, DB INSERT 후 COMMIT 완료", i);
                         }
                     }
 
+                    preparedStatement.executeBatch();
+                    preparedStatement.clearBatch();
+                    connection.commit();
+
                     day--;
+                    long dailyEndTime = System.currentTimeMillis();
+                    double dailyDuration = (dailyEndTime - dailyStartTime) / 1000.0;
+                    log.info("{}일 작업 시간 = {}초", yesterday.get(Calendar.DAY_OF_MONTH), dailyDuration);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -88,9 +97,11 @@ public class Query {
         }
 
         long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
+        double duration = (endTime - startTime) / 1000.0;
         log.info("배치 인서트 종료");
-        log.info("경과 시간 = {} 밀리초", duration);
+        log.info("총 데이터 건 수 = {}", DATA_SIZE * DAY_RANGE);
+        log.info("총 경과 시간 = {} 초", duration);
+        log.info("하루당 평균 소요 시간 = {} 초", String.format("%.3f", duration / DAY_RANGE));
     }
 
 }
